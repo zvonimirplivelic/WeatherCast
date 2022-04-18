@@ -1,4 +1,4 @@
-package com.zvonimirplivelic.weathercast
+package com.zvonimirplivelic.weathercast.model
 
 
 import com.google.gson.annotations.SerializedName
