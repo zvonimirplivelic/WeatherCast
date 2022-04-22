@@ -14,8 +14,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.zvonimirplivelic.weathercast.R
 import com.zvonimirplivelic.weathercast.WeatherCastViewModel
-import com.zvonimirplivelic.weathercast.util.Constants.latitude
-import com.zvonimirplivelic.weathercast.util.Constants.longitude
+import com.zvonimirplivelic.weathercast.util.Constants.LATITUDE
+import com.zvonimirplivelic.weathercast.util.Constants.LONGITUDE
 import com.zvonimirplivelic.weathercast.util.Resource
 import timber.log.Timber
 
@@ -41,7 +41,7 @@ class CurrentWeatherFragment : Fragment() {
         progressBar = view.findViewById(R.id.progress_bar)
         weatherDataTextView = view.findViewById(R.id.tv_weather_data)
 
-        viewModel.getWeatherData(latitude, longitude, apiKey)
+        viewModel.getWeatherData(LATITUDE, LONGITUDE, apiKey)
 
         viewModel.weatherData.observe(viewLifecycleOwner) { response ->
             when (response) {

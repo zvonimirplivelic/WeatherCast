@@ -2,13 +2,19 @@ package com.zvonimirplivelic.weathercast
 
 import android.app.Application
 import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationRequest
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.provider.ContactsContract
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
 import com.zvonimirplivelic.weathercast.model.WeatherResponse
 import com.zvonimirplivelic.weathercast.util.Resource
 import kotlinx.coroutines.delay
@@ -21,6 +27,9 @@ class WeatherCastViewModel(
     app: Application
 ) : AndroidViewModel(app) {
     private val weatherCastRepository: WeatherCastRepository = WeatherCastRepository()
+
+    private lateinit var longitude: String
+    private lateinit var latitude: String
 
     val weatherData: MutableLiveData<Resource<WeatherResponse>> = MutableLiveData()
     var weatherDataResponse: WeatherResponse? = null
@@ -102,4 +111,5 @@ class WeatherCastViewModel(
         }
         return false
     }
+
 }
