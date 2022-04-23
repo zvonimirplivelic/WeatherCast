@@ -36,8 +36,7 @@ class CurrentWeatherFragment : Fragment() {
     private lateinit var tvLocationName: TextView
     private lateinit var tvUpdatedTime: TextView
     private lateinit var tvCurrentTemperature: TextView
-    private lateinit var tvMinTemperature: TextView
-    private lateinit var tvMaxTemperature: TextView
+    private lateinit var tvMinMaxTemperature: TextView
     private lateinit var tvFeelsLikeTemperature: TextView
     private lateinit var tvWeatherDescription: TextView
     private lateinit var tvAirPressure: TextView
@@ -62,8 +61,7 @@ class CurrentWeatherFragment : Fragment() {
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
         tvLocationName = view.findViewById(R.id.tv_location_name)
         tvCurrentTemperature = view.findViewById(R.id.tv_current_temperature)
-        tvMinTemperature = view.findViewById(R.id.tv_minimum_temperature)
-        tvMaxTemperature = view.findViewById(R.id.tv_maximum_temperature)
+        tvMinMaxTemperature = view.findViewById(R.id.tv_min_max_temperature)
         tvFeelsLikeTemperature = view.findViewById(R.id.tv_feels_like_temperature)
         tvWeatherDescription = view.findViewById(R.id.tv_weather_description)
         tvAirPressure = view.findViewById(R.id.tv_air_pressure)
@@ -89,8 +87,7 @@ class CurrentWeatherFragment : Fragment() {
                         weatherData.let { weatherData ->
                             tvLocationName.text = weatherData.name
                             tvCurrentTemperature.text = weatherData.main.temp.toString()
-                            tvMinTemperature.text = weatherData.main.tempMin.toString()
-                            tvMaxTemperature.text = weatherData.main.tempMax.toString()
+                            tvMinMaxTemperature.text = "${weatherData.main.tempMin} / ${weatherData.main.tempMax}"
                             tvFeelsLikeTemperature.text = weatherData.main.feelsLike.toString()
                             tvWeatherDescription.text = weatherData.weather[0].description
                             tvAirPressure.text = weatherData.main.pressure.toString()
