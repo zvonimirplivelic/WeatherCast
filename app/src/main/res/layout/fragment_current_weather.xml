@@ -31,7 +31,7 @@
                     tools:text="Location: " />
 
                 <TextView
-                    android:id="@+id/tv_time_refreshed"
+                    android:id="@+id/tv_updated_time"
                     android:layout_width="wrap_content"
                     android:layout_marginTop="48dp"
                     android:layout_marginRight="16dp"
@@ -173,7 +173,7 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintRight_toRightOf="parent"
                     android:layout_margin="16dp"
-                    app:layout_constraintTop_toBottomOf="@id/tv_time_refreshed"/>
+                    app:layout_constraintTop_toBottomOf="@id/tv_updated_time"/>
 
                 <TextView
                     android:id="@+id/tv_sunset_time"

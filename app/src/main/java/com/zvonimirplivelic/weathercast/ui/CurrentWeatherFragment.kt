@@ -14,10 +14,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.zvonimirplivelic.weathercast.R
 import com.zvonimirplivelic.weathercast.WeatherCastViewModel
+import com.zvonimirplivelic.weathercast.model.WeatherResponse
 import com.zvonimirplivelic.weathercast.util.Constants
 import com.zvonimirplivelic.weathercast.util.Resource
 import timber.log.Timber
@@ -26,7 +28,25 @@ class CurrentWeatherFragment : Fragment() {
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var viewModel: WeatherCastViewModel
+    private lateinit var weatherData: WeatherResponse
+
     private lateinit var progressBar: ProgressBar
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+
+    private lateinit var tvLocationName: TextView
+    private lateinit var tvUpdatedTime: TextView
+    private lateinit var tvCurrentTemperature: TextView
+    private lateinit var tvMinTemperature: TextView
+    private lateinit var tvMaxTemperature: TextView
+    private lateinit var tvFeelsLikeTemperature: TextView
+    private lateinit var tvWeatherDescription: TextView
+    private lateinit var tvAirPressure: TextView
+    private lateinit var tvAirHumidity: TextView
+    private lateinit var tvWindSpeed: TextView
+    private lateinit var tvWindDirection: TextView
+    private lateinit var tvVisibility: TextView
+    private lateinit var tvSunriseTime: TextView
+    private lateinit var tvSunsetTime: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +59,21 @@ class CurrentWeatherFragment : Fragment() {
             LocationServices.getFusedLocationProviderClient(requireActivity())
 
         progressBar = view.findViewById(R.id.progress_bar)
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
+        tvLocationName = view.findViewById(R.id.tv_location_name)
+        tvCurrentTemperature = view.findViewById(R.id.tv_current_temperature)
+        tvMinTemperature = view.findViewById(R.id.tv_minimum_temperature)
+        tvMaxTemperature = view.findViewById(R.id.tv_maximum_temperature)
+        tvFeelsLikeTemperature = view.findViewById(R.id.tv_feels_like_temperature)
+        tvWeatherDescription = view.findViewById(R.id.tv_weather_description)
+        tvAirPressure = view.findViewById(R.id.tv_air_pressure)
+        tvAirHumidity = view.findViewById(R.id.tv_air_humidity)
+        tvWindSpeed = view.findViewById(R.id.tv_wind_speed)
+        tvWindDirection = view.findViewById(R.id.tv_wind_direction)
+        tvVisibility = view.findViewById(R.id.tv_visibility)
+        tvUpdatedTime = view.findViewById(R.id.tv_updated_time)
+        tvSunriseTime = view.findViewById(R.id.tv_sunrise_time)
+        tvSunsetTime = view.findViewById(R.id.tv_sunset_time)
 
         fetchLocation()
 
@@ -48,17 +83,34 @@ class CurrentWeatherFragment : Fragment() {
                 is Resource.Success -> {
                     progressBar.isVisible = false
                     response.data?.let { weatherResponse ->
-                        Timber.d("ResponseMain: ${weatherResponse}")
+                        Timber.d("ResponseMain: $weatherResponse")
+                        weatherData = weatherResponse
+
+                        weatherData.let { weatherData ->
+                            tvLocationName.text = weatherData.name
+                            tvCurrentTemperature.text = weatherData.main.temp.toString()
+                            tvMinTemperature.text = weatherData.main.tempMin.toString()
+                            tvMaxTemperature.text = weatherData.main.tempMax.toString()
+                            tvFeelsLikeTemperature.text = weatherData.main.feelsLike.toString()
+                            tvWeatherDescription.text = weatherData.weather[0].description
+                            tvAirPressure.text = weatherData.main.pressure.toString()
+                            tvAirHumidity.text = weatherData.main.humidity.toString()
+                            tvWindSpeed.text = weatherData.wind.speed.toString()
+                            tvWindDirection.text = weatherData.wind.deg.toString()
+                            tvVisibility.text = weatherData.visibility.toString()
+                            tvUpdatedTime.text = weatherData.dt.toString()
+                            tvSunsetTime.text = weatherData.sys.sunrise.toString()
+                            tvSunriseTime.text = weatherData.sys.sunset.toString()
+                        }
                     }
                 }
 
                 is Resource.Error -> {
                     progressBar.isVisible = false
-                    Timber.d("ResponseResErr: $response Resmes:${response.message}")
                     response.message?.let { message ->
                         Toast.makeText(
                             requireContext(),
-                            "An error occured: $message",
+                            "Unable to fetch weather data: $message",
                             Toast.LENGTH_LONG
                         )
                             .show()
@@ -93,7 +145,7 @@ class CurrentWeatherFragment : Fragment() {
             }
         }
     }
-    
+
     private fun checkLocationPermission(): Boolean {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
