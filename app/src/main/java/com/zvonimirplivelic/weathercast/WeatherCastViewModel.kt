@@ -28,9 +28,6 @@ class WeatherCastViewModel(
 ) : AndroidViewModel(app) {
     private val weatherCastRepository: WeatherCastRepository = WeatherCastRepository()
 
-    private lateinit var longitude: String
-    private lateinit var latitude: String
-
     val weatherData: MutableLiveData<Resource<WeatherResponse>> = MutableLiveData()
     var weatherDataResponse: WeatherResponse? = null
 
@@ -56,14 +53,18 @@ class WeatherCastViewModel(
                 weatherData.postValue(handleWeatherDataResponse(response))
             } else {
                 weatherData.postValue(Resource.Error("No internet connection"))
-                Timber.d("ResponseSWDC: $weatherData")
+                Timber.d("VMError: $weatherData")
             }
         } catch (t: Throwable) {
             when (t) {
                 is IOException -> weatherData.postValue(Resource.Error("Network Failure"))
                 else -> {
                     weatherData.postValue(Resource.Error("Conversion Error: $t"))
-                    Timber.d("Message ${t.message}")
+                    Timber.d("VMError lm ${t.localizedMessage}")
+                    Timber.d("VMError st${t.stackTrace}")
+                    Timber.d("VMError sup${t.suppressed}")
+                    Timber.d("VMError cause${t.cause}")
+                    Timber.d("VMError message${t.message}")
                 }
             }
 
