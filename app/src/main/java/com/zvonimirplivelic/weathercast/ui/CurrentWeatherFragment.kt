@@ -26,7 +26,6 @@ class CurrentWeatherFragment : Fragment() {
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var viewModel: WeatherCastViewModel
-    private lateinit var weatherDataTextView: TextView
     private lateinit var progressBar: ProgressBar
 
     override fun onCreateView(
@@ -40,7 +39,6 @@ class CurrentWeatherFragment : Fragment() {
             LocationServices.getFusedLocationProviderClient(requireActivity())
 
         progressBar = view.findViewById(R.id.progress_bar)
-        weatherDataTextView = view.findViewById(R.id.tv_weather_data)
 
         fetchLocation()
 
@@ -51,8 +49,6 @@ class CurrentWeatherFragment : Fragment() {
                     progressBar.isVisible = false
                     response.data?.let { weatherResponse ->
                         Timber.d("ResponseMain: ${weatherResponse}")
-                        weatherDataTextView.text =
-                            "${weatherResponse.name}${weatherResponse.main.temp}"
                     }
                 }
 
