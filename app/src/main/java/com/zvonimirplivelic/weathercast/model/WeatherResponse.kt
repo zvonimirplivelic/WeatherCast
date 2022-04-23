@@ -38,9 +38,9 @@ data class WeatherResponse(
 
     data class Coord(
         @SerializedName("lat")
-        val lat: Int,
+        val lat: Double,
         @SerializedName("lon")
-        val lon: Int
+        val lon: Double
     )
 
     data class Main(

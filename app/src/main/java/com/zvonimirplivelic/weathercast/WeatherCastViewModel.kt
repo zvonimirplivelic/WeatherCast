@@ -2,13 +2,19 @@ package com.zvonimirplivelic.weathercast
 
 import android.app.Application
 import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationRequest
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.provider.ContactsContract
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
 import com.zvonimirplivelic.weathercast.model.WeatherResponse
 import com.zvonimirplivelic.weathercast.util.Resource
 import kotlinx.coroutines.delay
@@ -47,14 +53,18 @@ class WeatherCastViewModel(
                 weatherData.postValue(handleWeatherDataResponse(response))
             } else {
                 weatherData.postValue(Resource.Error("No internet connection"))
-                Timber.d("ResponseSWDC: $weatherData")
+                Timber.d("VMError: $weatherData")
             }
         } catch (t: Throwable) {
             when (t) {
                 is IOException -> weatherData.postValue(Resource.Error("Network Failure"))
                 else -> {
                     weatherData.postValue(Resource.Error("Conversion Error: $t"))
-                    Timber.d("Message ${t.message}")
+                    Timber.d("VMError lm ${t.localizedMessage}")
+                    Timber.d("VMError st${t.stackTrace}")
+                    Timber.d("VMError sup${t.suppressed}")
+                    Timber.d("VMError cause${t.cause}")
+                    Timber.d("VMError message${t.message}")
                 }
             }
 
@@ -102,4 +112,5 @@ class WeatherCastViewModel(
         }
         return false
     }
+
 }
