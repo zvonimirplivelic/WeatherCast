@@ -23,6 +23,11 @@ import com.zvonimirplivelic.weathercast.model.WeatherResponse
 import com.zvonimirplivelic.weathercast.util.Constants
 import com.zvonimirplivelic.weathercast.util.Resource
 import timber.log.Timber
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.math.roundToInt
 
 class CurrentWeatherFragment : Fragment() {
 
@@ -43,6 +48,7 @@ class CurrentWeatherFragment : Fragment() {
     private lateinit var tvAirHumidity: TextView
     private lateinit var tvWindSpeed: TextView
     private lateinit var tvWindDirection: TextView
+    private lateinit var tvClouds: TextView
     private lateinit var tvVisibility: TextView
     private lateinit var tvSunriseTime: TextView
     private lateinit var tvSunsetTime: TextView
@@ -51,6 +57,7 @@ class CurrentWeatherFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         val view = inflater.inflate(R.layout.fragment_current_weather, container, false)
 
         viewModel = ViewModelProvider(this)[WeatherCastViewModel::class.java]
@@ -68,6 +75,7 @@ class CurrentWeatherFragment : Fragment() {
         tvAirHumidity = view.findViewById(R.id.tv_air_humidity)
         tvWindSpeed = view.findViewById(R.id.tv_wind_speed)
         tvWindDirection = view.findViewById(R.id.tv_wind_direction)
+        tvClouds = view.findViewById(R.id.tv_clouds)
         tvVisibility = view.findViewById(R.id.tv_visibility)
         tvUpdatedTime = view.findViewById(R.id.tv_updated_time)
         tvSunriseTime = view.findViewById(R.id.tv_sunrise_time)
@@ -76,28 +84,60 @@ class CurrentWeatherFragment : Fragment() {
         fetchLocation()
 
         viewModel.weatherData.observe(viewLifecycleOwner) { response ->
+
             when (response) {
 
                 is Resource.Success -> {
+
                     progressBar.isVisible = false
                     response.data?.let { weatherResponse ->
                         Timber.d("ResponseMain: $weatherResponse")
                         weatherData = weatherResponse
 
                         weatherData.let { weatherData ->
+
                             tvLocationName.text = weatherData.name
-                            tvCurrentTemperature.text = weatherData.main.temp.toString()
-                            tvMinMaxTemperature.text = "${weatherData.main.tempMin} / ${weatherData.main.tempMax}"
-                            tvFeelsLikeTemperature.text = weatherData.main.feelsLike.toString()
-                            tvWeatherDescription.text = weatherData.weather[0].description
-                            tvAirPressure.text = weatherData.main.pressure.toString()
-                            tvAirHumidity.text = weatherData.main.humidity.toString()
-                            tvWindSpeed.text = weatherData.wind.speed.toString()
-                            tvWindDirection.text = weatherData.wind.deg.toString()
-                            tvVisibility.text = weatherData.visibility.toString()
-                            tvUpdatedTime.text = weatherData.dt.toString()
-                            tvSunsetTime.text = weatherData.sys.sunrise.toString()
-                            tvSunriseTime.text = weatherData.sys.sunset.toString()
+                            tvCurrentTemperature.text = resources.getString(
+                                R.string.temperature_string,
+                                convertTemperature(weatherData.main.temp)
+                            )
+                            tvMinMaxTemperature.text =
+                                resources.getString(
+                                    R.string.min_max_temperature_string,
+                                    convertTemperature(weatherData.main.tempMin),
+                                    convertTemperature(weatherData.main.tempMax)
+                                )
+                            tvFeelsLikeTemperature.text =
+                                resources.getString(
+                                    R.string.temperature_string,
+                                    convertTemperature(weatherData.main.feelsLike)
+                                )
+                            tvWeatherDescription.text =
+                                weatherData.weather[0].description.replaceFirstChar { it.uppercase() }
+                            tvAirPressure.text = resources.getString(
+                                R.string.air_pressure_string,
+                                weatherData.main.pressure
+                            )
+                            tvAirHumidity.text = resources.getString(
+                                R.string.percentage_string,
+                                weatherData.main.humidity
+                            )
+                            tvWindSpeed.text =
+                                resources.getString(
+                                    R.string.kph_string,
+                                    convertToKPH(weatherData.wind.speed)
+                                )
+                            tvWindDirection.text =
+                                resources.getString(R.string.degrees_string, weatherData.wind.deg)
+                            tvClouds.text = resources.getString(
+                                R.string.percentage_string,
+                                weatherData.clouds.all
+                            )
+                            tvVisibility.text =
+                                resources.getString(R.string.meters_string, weatherData.visibility)
+                            tvUpdatedTime.text = convertTime(weatherData.dt)
+                            tvSunsetTime.text = convertTime(weatherData.sys.sunrise)
+                            tvSunriseTime.text = convertTime(weatherData.sys.sunset)
                         }
                     }
                 }
@@ -125,11 +165,13 @@ class CurrentWeatherFragment : Fragment() {
     }
 
     private fun fetchLocation() {
+
         val appInfo: ApplicationInfo = requireContext().packageManager
             .getApplicationInfo(requireContext().packageName, PackageManager.GET_META_DATA)
         val apiKey = appInfo.metaData["apiKey"].toString()
 
         fusedLocationProviderClient.lastLocation.also { task ->
+
             if (checkLocationPermission()) return
 
             task.addOnSuccessListener { location ->
@@ -141,6 +183,23 @@ class CurrentWeatherFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun convertTemperature(value: Double): String {
+        val convertedTemperature = value - 273.15
+        val temperatureString = convertedTemperature.toString()
+        return temperatureString.take(2)
+    }
+
+    private fun convertTime(time: Int, format: String = "EEE, MMMM d K:mm a"): String? {
+        val instant =
+            Instant.ofEpochSecond(time.toLong()).atZone(ZoneId.systemDefault()).toLocalDateTime()
+        val formatter = DateTimeFormatter.ofPattern(format, Locale.ROOT)
+        return instant.format(formatter)
+    }
+
+    private fun convertToKPH(value: Double): Int {
+        return (value * 3.6).roundToInt()
     }
 
     private fun checkLocationPermission(): Boolean {
