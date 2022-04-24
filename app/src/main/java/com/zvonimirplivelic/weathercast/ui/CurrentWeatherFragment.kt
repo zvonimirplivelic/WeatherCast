@@ -7,9 +7,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -35,6 +37,7 @@ class CurrentWeatherFragment : Fragment() {
     private lateinit var viewModel: WeatherCastViewModel
     private lateinit var weatherData: WeatherResponse
 
+    private lateinit var layout: ConstraintLayout
     private lateinit var progressBar: ProgressBar
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
@@ -47,6 +50,7 @@ class CurrentWeatherFragment : Fragment() {
     private lateinit var tvAirPressure: TextView
     private lateinit var tvAirHumidity: TextView
     private lateinit var tvWindSpeed: TextView
+    private lateinit var ivWindDirection: ImageView
     private lateinit var tvWindDirection: TextView
     private lateinit var tvClouds: TextView
     private lateinit var tvVisibility: TextView
@@ -64,8 +68,10 @@ class CurrentWeatherFragment : Fragment() {
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireActivity())
 
+        layout = view.findViewById(R.id.current_weather_layout)
         progressBar = view.findViewById(R.id.progress_bar)
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
+
         tvLocationName = view.findViewById(R.id.tv_location_name)
         tvCurrentTemperature = view.findViewById(R.id.tv_current_temperature)
         tvMinMaxTemperature = view.findViewById(R.id.tv_min_max_temperature)
@@ -74,6 +80,7 @@ class CurrentWeatherFragment : Fragment() {
         tvAirPressure = view.findViewById(R.id.tv_air_pressure)
         tvAirHumidity = view.findViewById(R.id.tv_air_humidity)
         tvWindSpeed = view.findViewById(R.id.tv_wind_speed)
+        ivWindDirection = view.findViewById(R.id.iv_wind_direction)
         tvWindDirection = view.findViewById(R.id.tv_wind_direction)
         tvClouds = view.findViewById(R.id.tv_clouds)
         tvVisibility = view.findViewById(R.id.tv_visibility)
@@ -88,7 +95,7 @@ class CurrentWeatherFragment : Fragment() {
             when (response) {
 
                 is Resource.Success -> {
-
+                    layout.isVisible = true
                     progressBar.isVisible = false
                     response.data?.let { weatherResponse ->
                         Timber.d("ResponseMain: $weatherResponse")
@@ -127,8 +134,20 @@ class CurrentWeatherFragment : Fragment() {
                                     R.string.kph_string,
                                     convertToKPH(weatherData.wind.speed)
                                 )
-                            tvWindDirection.text =
-                                resources.getString(R.string.degrees_string, weatherData.wind.deg)
+                            ivWindDirection.rotation = weatherData.wind.deg.toFloat()
+                            tvWindDirection.text = when ( weatherData.wind.deg) {
+                                in 0..22 ->"N"
+                                in 23..67 ->"NE"
+                                in 68..112 ->"E"
+                                in 113..157 ->"SE"
+                                in 158..202 ->"S"
+                                in 203..247 ->"SW"
+                                in 248..292 ->"W"
+                                in 293..337 ->"NW"
+                                in 338..360 -> "N"
+                                else -> "No direction"
+                            }
+
                             tvClouds.text = resources.getString(
                                 R.string.percentage_string,
                                 weatherData.clouds.all
@@ -136,13 +155,14 @@ class CurrentWeatherFragment : Fragment() {
                             tvVisibility.text =
                                 resources.getString(R.string.meters_string, weatherData.visibility)
                             tvUpdatedTime.text = convertTime(weatherData.dt)
-                            tvSunsetTime.text = convertTime(weatherData.sys.sunrise)
-                            tvSunriseTime.text = convertTime(weatherData.sys.sunset)
+                            tvSunriseTime.text = convertTime(weatherData.sys.sunrise)
+                            tvSunsetTime.text = convertTime(weatherData.sys.sunset)
                         }
                     }
                 }
 
                 is Resource.Error -> {
+                    layout.isVisible = false
                     progressBar.isVisible = false
                     response.message?.let { message ->
                         Toast.makeText(
@@ -156,11 +176,16 @@ class CurrentWeatherFragment : Fragment() {
                 }
 
                 is Resource.Loading -> {
+                    layout.isVisible = false
+                    swipeRefreshLayout.isRefreshing = false
                     progressBar.isVisible = true
                 }
             }
         }
 
+        swipeRefreshLayout.setOnRefreshListener {
+            fetchLocation()
+        }
         return view
     }
 
@@ -191,7 +216,7 @@ class CurrentWeatherFragment : Fragment() {
         return temperatureString.take(2)
     }
 
-    private fun convertTime(time: Int, format: String = "EEE, MMMM d K:mm a"): String? {
+    private fun convertTime(time: Int, format: String = "HH:mm:ss"): String? {
         val instant =
             Instant.ofEpochSecond(time.toLong()).atZone(ZoneId.systemDefault()).toLocalDateTime()
         val formatter = DateTimeFormatter.ofPattern(format, Locale.ROOT)
