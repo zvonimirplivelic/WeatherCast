@@ -122,11 +122,22 @@
                     android:id="@+id/iv_air_pressure"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_air_pressure"
                     android:layout_marginLeft="16dp"
+                    android:src="@drawable/ic_air_pressure"
                     app:layout_constraintBottom_toBottomOf="@id/tv_air_pressure"
-                    app:layout_constraintTop_toTopOf="@id/tv_air_pressure"
-                    app:layout_constraintLeft_toLeftOf="parent" />
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_air_pressure" />
+
+                <TextView
+                    android:id="@+id/tv_air_pressure_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="Air Pressure"
+                    app:layout_constraintBottom_toTopOf="@id/tv_air_pressure"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="@id/vertical_guideline"
+                    app:layout_constraintTop_toTopOf="@id/temperature_divider" />
 
                 <TextView
                     android:id="@+id/tv_air_pressure"
@@ -144,11 +155,22 @@
                     android:id="@+id/iv_air_humidity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_humidity"
                     android:layout_marginLeft="16dp"
+                    android:src="@drawable/ic_humidity"
                     app:layout_constraintBottom_toBottomOf="@id/tv_air_humidity"
-                    app:layout_constraintTop_toTopOf="@id/tv_air_humidity"
-                    app:layout_constraintLeft_toLeftOf="@id/vertical_guideline" />
+                    app:layout_constraintLeft_toLeftOf="@id/vertical_guideline"
+                    app:layout_constraintTop_toTopOf="@id/tv_air_humidity" />
+
+                <TextView
+                    android:id="@+id/tv_air_humidity_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="Air Humidity"
+                    app:layout_constraintBottom_toTopOf="@id/tv_air_humidity"
+                    app:layout_constraintLeft_toLeftOf="@id/vertical_guideline"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/temperature_divider" />
 
                 <TextView
                     android:id="@+id/tv_air_humidity"
@@ -173,12 +195,23 @@
                     android:id="@+id/iv_wind_direction"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="Wind Direction"
                     android:layout_marginLeft="16dp"
+                    android:contentDescription="Wind Direction"
                     android:src="@drawable/ic_wind_direction"
                     app:layout_constraintBottom_toBottomOf="@id/tv_wind_direction"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tv_wind_direction" />
+
+                <TextView
+                    android:id="@+id/tv_wind_direction_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="Wind Direction"
+                    app:layout_constraintBottom_toTopOf="@id/tv_wind_direction"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="@id/vertical_guideline"
+                    app:layout_constraintTop_toTopOf="@id/air_divider" />
 
                 <TextView
                     android:id="@+id/tv_wind_direction"
@@ -186,7 +219,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginVertical="32dp"
-                    android:text="@string/degrees_string"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="@id/vertical_guideline"
                     app:layout_constraintTop_toBottomOf="@id/air_divider"
@@ -196,11 +228,22 @@
                     android:id="@+id/iv_wind_speed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_wind_speed"
                     android:layout_marginLeft="16dp"
+                    android:src="@drawable/ic_wind_speed"
                     app:layout_constraintBottom_toBottomOf="@id/tv_wind_speed"
-                    app:layout_constraintTop_toTopOf="@id/tv_wind_speed"
-                    app:layout_constraintLeft_toLeftOf="@id/vertical_guideline" />
+                    app:layout_constraintLeft_toLeftOf="@id/vertical_guideline"
+                    app:layout_constraintTop_toTopOf="@id/tv_wind_speed" />
+
+                <TextView
+                    android:id="@+id/tv_wind_speed_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="Wind Speed"
+                    app:layout_constraintBottom_toTopOf="@id/tv_wind_speed"
+                    app:layout_constraintLeft_toLeftOf="@id/vertical_guideline"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/air_divider" />
 
                 <TextView
                     android:id="@+id/tv_wind_speed"
@@ -225,11 +268,22 @@
                     android:id="@+id/iv_clouds"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_clouds"
                     android:layout_marginLeft="16dp"
+                    android:src="@drawable/ic_clouds"
                     app:layout_constraintBottom_toBottomOf="@id/tv_clouds"
-                    app:layout_constraintTop_toTopOf="@id/tv_clouds"
-                    app:layout_constraintLeft_toLeftOf="parent" />
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_clouds" />
+
+                <TextView
+                    android:id="@+id/tv_clouds_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="Clouds"
+                    app:layout_constraintBottom_toTopOf="@id/tv_clouds"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="@id/vertical_guideline"
+                    app:layout_constraintTop_toTopOf="@id/wind_divider" />
 
                 <TextView
                     android:id="@+id/tv_clouds"
@@ -247,11 +301,22 @@
                     android:id="@+id/iv_visibility"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_visibility"
                     android:layout_marginLeft="16dp"
+                    android:src="@drawable/ic_visibility"
                     app:layout_constraintBottom_toBottomOf="@id/tv_visibility"
-                    app:layout_constraintTop_toTopOf="@id/tv_visibility"
-                    app:layout_constraintLeft_toLeftOf="@id/vertical_guideline" />
+                    app:layout_constraintLeft_toLeftOf="@id/vertical_guideline"
+                    app:layout_constraintTop_toTopOf="@id/tv_visibility" />
+
+                <TextView
+                    android:id="@+id/tv_visibility_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="Visibility"
+                    app:layout_constraintBottom_toTopOf="@id/tv_visibility"
+                    app:layout_constraintLeft_toLeftOf="@id/vertical_guideline"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/wind_divider" />
 
                 <TextView
                     android:id="@+id/tv_visibility"
@@ -276,11 +341,22 @@
                     android:id="@+id/iv_sunrise"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_sunrise"
                     android:layout_marginLeft="16dp"
+                    android:src="@drawable/ic_sunrise"
                     app:layout_constraintBottom_toBottomOf="@id/tv_sunrise_time"
-                    app:layout_constraintTop_toTopOf="@id/tv_sunrise_time"
-                    app:layout_constraintLeft_toLeftOf="parent" />
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_sunrise_time" />
+
+                <TextView
+                    android:id="@+id/tv_sunrise_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="Sunrise"
+                    app:layout_constraintBottom_toTopOf="@id/tv_sunrise_time"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="@id/vertical_guideline"
+                    app:layout_constraintTop_toTopOf="@id/visibility_divider" />
 
                 <TextView
                     android:id="@+id/tv_sunrise_time"
@@ -299,11 +375,22 @@
                     android:id="@+id/iv_sunset"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_sunset"
                     android:layout_marginLeft="16dp"
+                    android:src="@drawable/ic_sunset"
                     app:layout_constraintBottom_toBottomOf="@id/tv_sunset_time"
-                    app:layout_constraintTop_toTopOf="@id/tv_sunset_time"
-                    app:layout_constraintLeft_toLeftOf="@id/vertical_guideline" />
+                    app:layout_constraintLeft_toLeftOf="@id/vertical_guideline"
+                    app:layout_constraintTop_toTopOf="@id/tv_sunset_time" />
+
+                <TextView
+                    android:id="@+id/tv_sunset_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="Sunset"
+                    app:layout_constraintBottom_toTopOf="@id/tv_sunset_time"
+                    app:layout_constraintLeft_toLeftOf="@id/vertical_guideline"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/visibility_divider" />
 
                 <TextView
                     android:id="@+id/tv_sunset_time"
