@@ -56,6 +56,16 @@ class CurrentWeatherFragment : Fragment() {
     private lateinit var tvSunriseTime: TextView
     private lateinit var tvSunsetTime: TextView
 
+    private lateinit var tvAirQualityIndex: TextView
+    private lateinit var tvCOMeasurement: TextView
+    private lateinit var tvNOMeasurement: TextView
+    private lateinit var tvNO2Measurement: TextView
+    private lateinit var tvO3Measurement: TextView
+    private lateinit var tvSO2Measurement: TextView
+    private lateinit var tvPM25Measurement: TextView
+    private lateinit var tvPM10Measurement: TextView
+    private lateinit var tvNH3Measurement: TextView
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -87,6 +97,16 @@ class CurrentWeatherFragment : Fragment() {
         tvUpdatedTime = view.findViewById(R.id.tv_updated_time)
         tvSunriseTime = view.findViewById(R.id.tv_sunrise_time)
         tvSunsetTime = view.findViewById(R.id.tv_sunset_time)
+
+        tvAirQualityIndex = view.findViewById(R.id.tv_air_quality_index)
+        tvCOMeasurement = view.findViewById(R.id.tv_co_measurement)
+        tvNOMeasurement = view.findViewById(R.id.tv_no_measurement)
+        tvNO2Measurement = view.findViewById(R.id.tv_no2_measurement)
+        tvO3Measurement = view.findViewById(R.id.tv_o3_measurement)
+        tvSO2Measurement = view.findViewById(R.id.tv_so2_measurement)
+        tvPM25Measurement = view.findViewById(R.id.tv_pm25_measurement)
+        tvPM10Measurement = view.findViewById(R.id.tv_pm10_measurement)
+        tvNH3Measurement = view.findViewById(R.id.tv_nh3_measurement)
 
         fetchLocation()
 
@@ -210,7 +230,6 @@ class CurrentWeatherFragment : Fragment() {
                             Toast.LENGTH_LONG
                         )
                             .show()
-                        Timber.d("ResponseMessage: $message")
                     }
                 }
 
@@ -222,6 +241,81 @@ class CurrentWeatherFragment : Fragment() {
                 }
             }
         }
+
+        viewModel.airPollutionWeatherData.observe(viewLifecycleOwner) { response ->
+            when (response) {
+
+                is Resource.Success -> {
+
+                    parentLayout.isVisible = true
+                    childLayout.isVisible = true
+                    progressBar.isVisible = false
+
+                    response.data?.let { airPollutionData ->
+
+                        val pollutionData = airPollutionData.list[0]
+                        tvAirQualityIndex.text = resources.getString(
+                            R.string.air_quality_index_string,
+                            pollutionData.main.aqi
+                        )
+                        tvCOMeasurement.text = resources.getString(
+                            R.string.co_measurement_string,
+                            pollutionData.components.co.toString().take(6)
+                        )
+                        tvNOMeasurement.text = resources.getString(
+                            R.string.no_measurement_string,
+                            pollutionData.components.no.toString().take(6)
+                        )
+                        tvNO2Measurement.text = resources.getString(
+                            R.string.no2_measurement_string,
+                            pollutionData.components.no2.toString().take(6)
+                        )
+                        tvO3Measurement.text = resources.getString(
+                            R.string.o3_measurement_string,
+                            pollutionData.components.o3.toString().take(6)
+                        )
+                        tvSO2Measurement.text = resources.getString(
+                            R.string.so2_measurement_string,
+                            pollutionData.components.so2.toString().take(6)
+                        )
+                        tvPM25Measurement.text = resources.getString(
+                            R.string.pm2_5_measurement_string,
+                            pollutionData.components.pm25.toString().take(6)
+                        )
+                        tvPM10Measurement.text = resources.getString(
+                            R.string.pm10_measurement_string,
+                            pollutionData.components.pm10.toString().take(6)
+                        )
+                        tvNH3Measurement.text = resources.getString(
+                            R.string.nh3_measurement_string,
+                            pollutionData.components.nh3.toString().take(6)
+                        )
+                    }
+                }
+
+                is Resource.Error -> {
+                    parentLayout.isVisible = false
+                    childLayout.isVisible = false
+                    progressBar.isVisible = false
+                    response.message?.let { message ->
+                        Toast.makeText(
+                            requireContext(),
+                            "Unable to fetch air pollution data: $message",
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
+                    }
+                }
+
+                is Resource.Loading -> {
+                    parentLayout.isVisible = false
+                    childLayout.isVisible = false
+                    swipeRefreshLayout.isRefreshing = false
+                    progressBar.isVisible = true
+                }
+            }
+        }
+
 
         swipeRefreshLayout.setOnRefreshListener {
             fetchLocation()
@@ -244,7 +338,7 @@ class CurrentWeatherFragment : Fragment() {
                     val lat = location.latitude.toString()
                     val lon = location.longitude.toString()
 
-                    viewModel.getWeatherData(lat, lon, apiKey)
+                    viewModel.getRemoteData(lat, lon, apiKey)
                 }
             }
         }

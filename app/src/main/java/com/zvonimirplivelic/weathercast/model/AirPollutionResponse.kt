@@ -7,16 +7,16 @@ data class AirPollutionResponse(
     @SerializedName("coord")
     val coord: Coord,
     @SerializedName("list")
-    val list: List<>
+    val list: List<Pollution>
 ) {
     data class Coord(
         @SerializedName("lat")
         val lat: Double,
         @SerializedName("lon")
-        val lon: Int
+        val lon: Double
     )
 
-    data class (
+    data class Pollution(
         @SerializedName("components")
         val components: Components,
         @SerializedName("dt")

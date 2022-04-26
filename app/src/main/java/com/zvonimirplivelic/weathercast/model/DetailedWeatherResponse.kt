@@ -15,7 +15,7 @@ data class DetailedWeatherResponse(
     @SerializedName("lat")
     val lat: Double,
     @SerializedName("lon")
-    val lon: Int,
+    val lon: Double,
     @SerializedName("minutely")
     val minutely: List<Minutely>,
     @SerializedName("timezone")
@@ -58,7 +58,7 @@ data class DetailedWeatherResponse(
         @SerializedName("temp")
         val temp: Double,
         @SerializedName("uvi")
-        val uvi: Int,
+        val uvi: Double,
         @SerializedName("visibility")
         val visibility: Int,
         @SerializedName("weather")
@@ -211,6 +211,6 @@ data class DetailedWeatherResponse(
         @SerializedName("dt")
         val dt: Int,
         @SerializedName("precipitation")
-        val precipitation: Int
+        val precipitation: Double
     )
 }
