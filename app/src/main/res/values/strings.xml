@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">WeatherCast</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="temperature_string">%s°C</string>
-    <string name="min_max_temperature_string">%1s°C / %2s°C</string>
+    <string name="min_max_temperature_string">Min: %1s°C / Max: %2s°C</string>
+    <string name="feels_like_temperature_string">Feels like: %s°C</string>
     <string name="air_pressure_string">%dhPa</string>
     <string name="percentage_string">%d%%</string>
     <string name="degrees_string">%d°</string>
     <string name="kph_string">%dkm/h</string>
     <string name="meters_string">%dm</string>
+    <string name="updated_time_string">Updated at: %s</string>
 </resources>

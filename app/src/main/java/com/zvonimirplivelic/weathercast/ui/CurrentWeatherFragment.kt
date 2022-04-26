@@ -67,7 +67,7 @@ class CurrentWeatherFragment : Fragment() {
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        parentLayout = view.findViewById(R.id.current_weather_fragment)
+        parentLayout = view.findViewById(R.id.current_weather_scroll_view)
         childLayout = view.findViewById(R.id.current_weather_layout)
         progressBar = view.findViewById(R.id.progress_bar)
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
@@ -95,6 +95,7 @@ class CurrentWeatherFragment : Fragment() {
             when (response) {
 
                 is Resource.Success -> {
+                    parentLayout.isVisible = true
                     childLayout.isVisible = true
                     progressBar.isVisible = false
                     response.data?.let { weatherResponse ->
@@ -114,7 +115,9 @@ class CurrentWeatherFragment : Fragment() {
                                 801 -> R.drawable.pic_clouds_light
                                 802 -> R.drawable.pic_clouds_medium
                                 803, 804 -> R.drawable.pic_clouds_heavy
-                                else -> {R.drawable.bg_day}
+                                else -> {
+                                    R.drawable.bg_day
+                                }
                             }
 
                             parentLayout.background =
@@ -148,7 +151,7 @@ class CurrentWeatherFragment : Fragment() {
                                 )
                             tvFeelsLikeTemperature.text =
                                 resources.getString(
-                                    R.string.temperature_string,
+                                    R.string.feels_like_temperature_string,
                                     convertTemperature(weatherData.main.feelsLike)
                                 )
                             tvWeatherDescription.text =
@@ -186,7 +189,10 @@ class CurrentWeatherFragment : Fragment() {
                             )
                             tvVisibility.text =
                                 resources.getString(R.string.meters_string, weatherData.visibility)
-                            tvUpdatedTime.text = convertTime(weatherData.dt)
+                            tvUpdatedTime.text = resources.getString(
+                                R.string.updated_time_string,
+                                convertTime(weatherData.dt)
+                            )
                             tvSunriseTime.text = convertTime(weatherData.sys.sunrise)
                             tvSunsetTime.text = convertTime(weatherData.sys.sunset)
                         }
@@ -194,6 +200,7 @@ class CurrentWeatherFragment : Fragment() {
                 }
 
                 is Resource.Error -> {
+                    parentLayout.isVisible = false
                     childLayout.isVisible = false
                     progressBar.isVisible = false
                     response.message?.let { message ->
@@ -244,9 +251,8 @@ class CurrentWeatherFragment : Fragment() {
     }
 
     private fun convertTemperature(value: Double): String {
-        val convertedTemperature = value - 273.15
-        val temperatureString = convertedTemperature.toString()
-        return temperatureString.take(2)
+        val convertedTemperature = (value - 273.15).roundToInt()
+        return convertedTemperature.toString()
     }
 
     private fun convertTime(time: Int, format: String = "HH:mm:ss"): String? {
