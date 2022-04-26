@@ -7,12 +7,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -37,7 +35,8 @@ class CurrentWeatherFragment : Fragment() {
     private lateinit var viewModel: WeatherCastViewModel
     private lateinit var weatherData: WeatherResponse
 
-    private lateinit var layout: ConstraintLayout
+    private lateinit var parentLayout: FrameLayout
+    private lateinit var childLayout: ConstraintLayout
     private lateinit var progressBar: ProgressBar
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
@@ -68,7 +67,8 @@ class CurrentWeatherFragment : Fragment() {
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        layout = view.findViewById(R.id.current_weather_layout)
+        parentLayout = view.findViewById(R.id.current_weather_fragment)
+        childLayout = view.findViewById(R.id.current_weather_layout)
         progressBar = view.findViewById(R.id.progress_bar)
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
 
@@ -95,13 +95,45 @@ class CurrentWeatherFragment : Fragment() {
             when (response) {
 
                 is Resource.Success -> {
-                    layout.isVisible = true
+                    childLayout.isVisible = true
                     progressBar.isVisible = false
                     response.data?.let { weatherResponse ->
                         Timber.d("ResponseMain: $weatherResponse")
                         weatherData = weatherResponse
 
                         weatherData.let { weatherData ->
+
+                            val weatherGraphicsCode = when (weatherData.weather[0].id) {
+                                in 200..232 -> R.drawable.pic_thunderstorm
+                                in 300..321 -> R.drawable.pic_drizzle
+                                in 500..504 -> R.drawable.pic_rain
+                                in 600..622 -> R.drawable.pic_snow
+                                in 700..781 -> R.drawable.pic_mist
+                                511 -> R.drawable.pic_snow
+                                800 -> R.drawable.pic_clear
+                                801 -> R.drawable.pic_clouds_light
+                                802 -> R.drawable.pic_clouds_medium
+                                803, 804 -> R.drawable.pic_clouds_heavy
+                                else -> {R.drawable.bg_day}
+                            }
+
+                            parentLayout.background =
+                                ContextCompat.getDrawable(requireActivity(), weatherGraphicsCode)
+
+                            childLayout.background =
+                                if (weatherData.dt > weatherData.sys.sunrise &&
+                                    weatherData.dt < weatherData.sys.sunset
+                                ) {
+                                    ContextCompat.getDrawable(
+                                        requireActivity(),
+                                        R.drawable.bg_day
+                                    );
+                                } else {
+                                    ContextCompat.getDrawable(
+                                        requireActivity(),
+                                        R.drawable.bg_night
+                                    );
+                                }
 
                             tvLocationName.text = weatherData.name
                             tvCurrentTemperature.text = resources.getString(
@@ -135,15 +167,15 @@ class CurrentWeatherFragment : Fragment() {
                                     convertToKPH(weatherData.wind.speed)
                                 )
                             ivWindDirection.rotation = weatherData.wind.deg.toFloat()
-                            tvWindDirection.text = when ( weatherData.wind.deg) {
-                                in 0..22 ->"N"
-                                in 23..67 ->"NE"
-                                in 68..112 ->"E"
-                                in 113..157 ->"SE"
-                                in 158..202 ->"S"
-                                in 203..247 ->"SW"
-                                in 248..292 ->"W"
-                                in 293..337 ->"NW"
+                            tvWindDirection.text = when (weatherData.wind.deg) {
+                                in 0..22 -> "N"
+                                in 23..67 -> "NE"
+                                in 68..112 -> "E"
+                                in 113..157 -> "SE"
+                                in 158..202 -> "S"
+                                in 203..247 -> "SW"
+                                in 248..292 -> "W"
+                                in 293..337 -> "NW"
                                 in 338..360 -> "N"
                                 else -> "No direction"
                             }
@@ -162,7 +194,7 @@ class CurrentWeatherFragment : Fragment() {
                 }
 
                 is Resource.Error -> {
-                    layout.isVisible = false
+                    childLayout.isVisible = false
                     progressBar.isVisible = false
                     response.message?.let { message ->
                         Toast.makeText(
@@ -176,7 +208,8 @@ class CurrentWeatherFragment : Fragment() {
                 }
 
                 is Resource.Loading -> {
-                    layout.isVisible = false
+                    parentLayout.isVisible = false
+                    childLayout.isVisible = false
                     swipeRefreshLayout.isRefreshing = false
                     progressBar.isVisible = true
                 }
