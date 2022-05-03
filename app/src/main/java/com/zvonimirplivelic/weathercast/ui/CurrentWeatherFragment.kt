@@ -14,26 +14,29 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.squareup.picasso.Picasso
 import com.zvonimirplivelic.weathercast.R
 import com.zvonimirplivelic.weathercast.WeatherCastViewModel
-import com.zvonimirplivelic.weathercast.model.WeatherResponse
+import com.zvonimirplivelic.weathercast.model.DetailedWeatherResponse
 import com.zvonimirplivelic.weathercast.util.Constants
 import com.zvonimirplivelic.weathercast.util.Resource
-import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.roundToInt
 
+
 class CurrentWeatherFragment : Fragment() {
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var viewModel: WeatherCastViewModel
-    private lateinit var weatherData: WeatherResponse
+    lateinit var hourlyForecastAdapter: HourlyForecastAdapter
 
     private lateinit var parentLayout: FrameLayout
     private lateinit var childLayout: ConstraintLayout
@@ -41,6 +44,7 @@ class CurrentWeatherFragment : Fragment() {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private lateinit var tvLocationName: TextView
+    private lateinit var ivCurrentWeatherImage: ImageView
     private lateinit var tvUpdatedTime: TextView
     private lateinit var tvCurrentTemperature: TextView
     private lateinit var tvMinMaxTemperature: TextView
@@ -55,6 +59,8 @@ class CurrentWeatherFragment : Fragment() {
     private lateinit var tvVisibility: TextView
     private lateinit var tvSunriseTime: TextView
     private lateinit var tvSunsetTime: TextView
+
+    private lateinit var rvHourlyForecast: RecyclerView
 
     private lateinit var tvAirQualityIndex: TextView
     private lateinit var tvCOMeasurement: TextView
@@ -83,10 +89,15 @@ class CurrentWeatherFragment : Fragment() {
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
 
         tvLocationName = view.findViewById(R.id.tv_location_name)
+        ivCurrentWeatherImage = view.findViewById(R.id.iv_current_weather_image)
         tvCurrentTemperature = view.findViewById(R.id.tv_current_temperature)
         tvMinMaxTemperature = view.findViewById(R.id.tv_min_max_temperature)
         tvFeelsLikeTemperature = view.findViewById(R.id.tv_feels_like_temperature)
         tvWeatherDescription = view.findViewById(R.id.tv_weather_description)
+
+        rvHourlyForecast = view.findViewById(R.id.rv_hourly_forecast)
+        hourlyForecastAdapter = HourlyForecastAdapter()
+
         tvAirPressure = view.findViewById(R.id.tv_air_pressure)
         tvAirHumidity = view.findViewById(R.id.tv_air_humidity)
         tvWindSpeed = view.findViewById(R.id.tv_wind_speed)
@@ -118,11 +129,10 @@ class CurrentWeatherFragment : Fragment() {
                     parentLayout.isVisible = true
                     childLayout.isVisible = true
                     progressBar.isVisible = false
-                    response.data?.let { weatherResponse ->
-                        Timber.d("ResponseMain: $weatherResponse")
-                        weatherData = weatherResponse
 
-                        weatherData.let { weatherData ->
+                    response.data?.let { weatherResponse ->
+
+                        weatherResponse.let { weatherData ->
 
                             val weatherGraphicsCode = when (weatherData.weather[0].id) {
                                 in 200..232 -> R.drawable.pic_thunderstorm
@@ -159,6 +169,14 @@ class CurrentWeatherFragment : Fragment() {
                                 }
 
                             tvLocationName.text = weatherData.name
+
+                            val weatherImageURLString =
+                                "https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png"
+
+                            Picasso.get().load(weatherImageURLString)
+                                .resize(275, 275)
+                                .into(ivCurrentWeatherImage)
+
                             tvCurrentTemperature.text = resources.getString(
                                 R.string.temperature_string,
                                 convertTemperature(weatherData.main.temp)
@@ -176,6 +194,7 @@ class CurrentWeatherFragment : Fragment() {
                                 )
                             tvWeatherDescription.text =
                                 weatherData.weather[0].description.replaceFirstChar { it.uppercase() }
+
                             tvAirPressure.text = resources.getString(
                                 R.string.air_pressure_string,
                                 weatherData.main.pressure
@@ -227,6 +246,55 @@ class CurrentWeatherFragment : Fragment() {
                         Toast.makeText(
                             requireContext(),
                             "Unable to fetch weather data: $message",
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
+                    }
+                }
+
+                is Resource.Loading -> {
+                    parentLayout.isVisible = false
+                    childLayout.isVisible = false
+                    swipeRefreshLayout.isRefreshing = false
+                    progressBar.isVisible = true
+                }
+            }
+        }
+
+        viewModel.detailedWeatherData.observe(viewLifecycleOwner) { response ->
+            when (response) {
+
+                is Resource.Success -> {
+
+                    parentLayout.isVisible = true
+                    childLayout.isVisible = true
+                    progressBar.isVisible = false
+
+                    response.data?.let { detailedForecastData ->
+                        val hourlyForecast =
+                            detailedForecastData.hourlyWeather.subList(1, 25)
+                        val horizontalLayoutManager = LinearLayoutManager(
+                            requireContext(),
+                            LinearLayoutManager.HORIZONTAL,
+                            false
+                        )
+                        hourlyForecastAdapter.differ.submitList(hourlyForecast)
+                        rvHourlyForecast.apply {
+                            layoutManager = horizontalLayoutManager
+                            adapter = hourlyForecastAdapter
+                        }
+
+                    }
+                }
+
+                is Resource.Error -> {
+                    parentLayout.isVisible = false
+                    childLayout.isVisible = false
+                    progressBar.isVisible = false
+                    response.message?.let { message ->
+                        Toast.makeText(
+                            requireContext(),
+                            "Unable to fetch detailed weather data: $message",
                             Toast.LENGTH_LONG
                         )
                             .show()

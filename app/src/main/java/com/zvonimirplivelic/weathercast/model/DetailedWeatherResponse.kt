@@ -9,9 +9,9 @@ data class DetailedWeatherResponse(
     @SerializedName("current")
     val current: Current,
     @SerializedName("daily")
-    val daily: List<Daily>,
+    val dailyWeather: List<DailyWeather>,
     @SerializedName("hourly")
-    val hourly: List<Hourly>,
+    val hourlyWeather: List<HourlyWeather>,
     @SerializedName("lat")
     val lat: Double,
     @SerializedName("lon")
@@ -80,7 +80,7 @@ data class DetailedWeatherResponse(
         )
     }
 
-    data class Daily(
+    data class DailyWeather(
         @SerializedName("clouds")
         val clouds: Int,
         @SerializedName("dew_point")
@@ -158,7 +158,7 @@ data class DetailedWeatherResponse(
         )
     }
 
-    data class Hourly(
+    data class HourlyWeather(
         @SerializedName("clouds")
         val clouds: Int,
         @SerializedName("dew_point")
