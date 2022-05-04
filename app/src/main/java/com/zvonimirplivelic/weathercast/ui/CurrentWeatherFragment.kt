@@ -22,7 +22,6 @@ import com.google.android.gms.location.LocationServices
 import com.squareup.picasso.Picasso
 import com.zvonimirplivelic.weathercast.R
 import com.zvonimirplivelic.weathercast.WeatherCastViewModel
-import com.zvonimirplivelic.weathercast.model.DetailedWeatherResponse
 import com.zvonimirplivelic.weathercast.util.Constants
 import com.zvonimirplivelic.weathercast.util.Resource
 import java.time.Instant
@@ -39,6 +38,7 @@ class CurrentWeatherFragment : Fragment() {
     lateinit var hourlyForecastAdapter: HourlyForecastAdapter
     lateinit var dailyForecastAdapter: DailyForecastAdapter
 
+    private lateinit var cvCurrentWeather: ConstraintLayout
     private lateinit var parentLayout: FrameLayout
     private lateinit var childLayout: ConstraintLayout
     private lateinit var progressBar: ProgressBar
@@ -87,6 +87,7 @@ class CurrentWeatherFragment : Fragment() {
             LocationServices.getFusedLocationProviderClient(requireActivity())
 
         parentLayout = view.findViewById(R.id.current_weather_scroll_view)
+        cvCurrentWeather = view.findViewById(R.id.cl_current_weather)
         childLayout = view.findViewById(R.id.current_weather_layout)
         progressBar = view.findViewById(R.id.progress_bar)
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
@@ -159,18 +160,32 @@ class CurrentWeatherFragment : Fragment() {
                             parentLayout.background =
                                 ContextCompat.getDrawable(requireActivity(), weatherGraphicsCode)
 
+                            cvCurrentWeather.background = if (weatherData.dt > weatherData.sys.sunrise &&
+                                weatherData.dt < weatherData.sys.sunset
+                            ) {
+                                ContextCompat.getDrawable(
+                                    requireActivity(),
+                                    R.drawable.bg_day
+                                );
+                            } else {
+                                ContextCompat.getDrawable(
+                                    requireActivity(),
+                                    R.drawable.bg_night
+                                );
+                            }
+
                             childLayout.background =
                                 if (weatherData.dt > weatherData.sys.sunrise &&
                                     weatherData.dt < weatherData.sys.sunset
                                 ) {
                                     ContextCompat.getDrawable(
                                         requireActivity(),
-                                        R.drawable.bg_day
+                                        R.color.day_blue
                                     );
                                 } else {
                                     ContextCompat.getDrawable(
                                         requireActivity(),
-                                        R.drawable.bg_night
+                                        R.color.night_black
                                     );
                                 }
 

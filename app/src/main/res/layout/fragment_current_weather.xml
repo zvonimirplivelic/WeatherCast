@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/day_blue"
     android:layout_height="match_parent"
     tools:context=".ui.CurrentWeatherFragment">
 
@@ -19,8 +20,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/current_weather_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/bg_day"
+                android:layout_height="wrap_content"
                 android:visibility="gone"
                 tools:visibility="visible">
 
@@ -33,99 +33,117 @@
                     app:layout_constraintGuide_percent="0.5"
                     app:layout_constraintStart_toStartOf="parent" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_current_weather"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:src="@drawable/ic_location"
-                    app:layout_constraintBottom_toBottomOf="@id/tv_location_name"
+                    app:cardCornerRadius="16dp"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/tv_location_name"
-                    app:layout_constraintTop_toTopOf="@id/tv_location_name" />
-
-                <TextView
-                    android:id="@+id/tv_location_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="32dp"
-                    android:textSize="32sp"
-                    app:layout_constraintRight_toRightOf="@id/tv_location_name"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Location: " />
-
-                <ImageView
-                    android:id="@+id/iv_current_weather_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    app:layout_constraintBottom_toTopOf="@id/tv_updated_time"
-                    app:layout_constraintLeft_toRightOf="@id/tv_current_temperature"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
-                    android:id="@+id/tv_current_temperature"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:text="@string/temperature_string"
-                    android:textSize="48sp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_location_name"
-                    tools:text="CurTemp" />
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_current_weather"
+                        android:layout_width="match_parent"
+                        android:background="@drawable/bg_day"
+                        android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/iv_weather_condition"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:contentDescription="Weather Conditions"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:src="@drawable/ic_location"
+                        app:layout_constraintBottom_toBottomOf="@id/tv_location_name"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/tv_location_name"
+                        app:layout_constraintTop_toTopOf="@id/tv_location_name" />
 
-                <TextView
-                    android:id="@+id/tv_weather_description"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:textSize="24sp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_current_temperature"
-                    tools:text="Description" />
+                    <TextView
+                        android:id="@+id/tv_location_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="32dp"
+                        android:textSize="32sp"
+                        app:layout_constraintRight_toRightOf="@id/tv_location_name"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="Location: " />
 
-                <TextView
-                    android:id="@+id/tv_min_max_temperature"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:text="@string/min_max_temperature_string"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_weather_description"
-                    tools:text="MinMaxTemp" />
+                    <ImageView
+                        android:id="@+id/iv_current_weather_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        app:layout_constraintBottom_toTopOf="@id/tv_updated_time"
+                        app:layout_constraintLeft_toRightOf="@id/tv_current_temperature"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/tv_feels_like_temperature"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:text="@string/temperature_string"
-                    app:layout_constraintBottom_toTopOf="@id/current_weather_divider"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_min_max_temperature"
-                    tools:text="Feels like" />
+                    <TextView
+                        android:id="@+id/tv_current_temperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:text="@string/temperature_string"
+                        android:textSize="48sp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_location_name"
+                        tools:text="CurTemp" />
 
-                <TextView
-                    android:id="@+id/tv_updated_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="48dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:textSize="12sp"
-                    android:textStyle="italic"
-                    app:layout_constraintBottom_toTopOf="@id/current_weather_divider"
-                    app:layout_constraintRight_toRightOf="parent"
-                    tools:text="Updated time" />
+                    <ImageView
+                        android:id="@+id/iv_weather_condition"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:contentDescription="Weather Conditions"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tv_weather_description"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:textSize="24sp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_current_temperature"
+                        tools:text="Description" />
+
+                    <TextView
+                        android:id="@+id/tv_min_max_temperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:text="@string/min_max_temperature_string"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_weather_description"
+                        tools:text="MinMaxTemp" />
+
+                    <TextView
+                        android:id="@+id/tv_feels_like_temperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:text="@string/temperature_string"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_min_max_temperature"
+                        tools:text="Feels like" />
+
+                    <TextView
+                        android:id="@+id/tv_updated_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="48dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:textSize="12sp"
+                        android:textStyle="italic"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        tools:text="Updated time" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/current_weather_divider"
@@ -133,7 +151,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginVertical="32dp"
-                    app:layout_constraintTop_toBottomOf="@id/tv_feels_like_temperature" />
+                    app:layout_constraintTop_toBottomOf="@id/cv_current_weather" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_hourly_forecast"
