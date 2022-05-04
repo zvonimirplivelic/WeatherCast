@@ -2,6 +2,7 @@
     <string name="app_name">WeatherCast</string>
     <string name="temperature_string">%s°C</string>
     <string name="min_max_temperature_string">Min: %1s°C / Max: %2s°C</string>
+    <string name="min_max_temperature_string_daily">%1s°C / %2s°C</string>
     <string name="feels_like_temperature_string">Feels like: %s°C</string>
     <string name="air_pressure_string">%dhPa</string>
     <string name="percentage_string">%d%%</string>
@@ -9,4 +10,13 @@
     <string name="kph_string">%dkm/h</string>
     <string name="meters_string">%dm</string>
     <string name="updated_time_string">Updated at: %s</string>
+    <string name="air_quality_index_string">Air quality index: %d</string>
+    <string name="co_measurement_string">CO: %s</string>
+    <string name="no_measurement_string">NO: %s</string>
+    <string name="no2_measurement_string">NO2: %s</string>
+    <string name="o3_measurement_string">O3: %s</string>
+    <string name="so2_measurement_string">SO2: %s</string>
+    <string name="pm2_5_measurement_string">PM2.5: %s</string>
+    <string name="pm10_measurement_string">PM10: %s</string>
+    <string name="nh3_measurement_string">NH3: %s</string>
 </resources>

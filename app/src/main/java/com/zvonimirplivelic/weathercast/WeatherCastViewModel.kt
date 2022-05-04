@@ -2,21 +2,17 @@ package com.zvonimirplivelic.weathercast
 
 import android.app.Application
 import android.content.Context
-import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationRequest
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
-import android.provider.ContactsContract
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
+import com.zvonimirplivelic.weathercast.model.AirPollutionResponse
+import com.zvonimirplivelic.weathercast.model.DetailedWeatherResponse
 import com.zvonimirplivelic.weathercast.model.WeatherResponse
 import com.zvonimirplivelic.weathercast.util.Resource
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Response
@@ -29,28 +25,58 @@ class WeatherCastViewModel(
     private val weatherCastRepository: WeatherCastRepository = WeatherCastRepository()
 
     val weatherData: MutableLiveData<Resource<WeatherResponse>> = MutableLiveData()
-    var weatherDataResponse: WeatherResponse? = null
+    val detailedWeatherData: MutableLiveData<Resource<DetailedWeatherResponse>> = MutableLiveData()
+    val airPollutionWeatherData: MutableLiveData<Resource<AirPollutionResponse>> = MutableLiveData()
 
+    private var weatherDataResponse: WeatherResponse? = null
+    var detailedWeatherResponse: DetailedWeatherResponse? = null
+    var airPollutionResponse: AirPollutionResponse? = null
 
-    fun getWeatherData(
+    fun getRemoteData(
         latitude: String,
         longitude: String,
         apiKey: String
     ) = viewModelScope.launch {
-        safeWeatherDataCall(latitude, longitude, apiKey)
+        coroutineScope {
+            safeRemoteDataCall(latitude, longitude, apiKey)
+        }
     }
 
-    private suspend fun safeWeatherDataCall(latitude: String, longitude: String, apiKey: String) {
+    private suspend fun safeRemoteDataCall(latitude: String, longitude: String, apiKey: String) {
         weatherData.postValue(Resource.Loading())
+        detailedWeatherData.postValue(Resource.Loading())
+        airPollutionWeatherData.postValue(Resource.Loading())
+
         try {
             if (hasInternetConnection()) {
-                val response = weatherCastRepository.getWeatherData(latitude, longitude, apiKey)
-                Timber.d(
-                    "URL request: ${response.raw().request.url}"
-                )
-                delay(444L)
-                Timber.d("ResponseSWDC: ${response.errorBody()}")
-                weatherData.postValue(handleWeatherDataResponse(response))
+                coroutineScope {
+                    val weatherDataResponse =
+                        async { weatherCastRepository.getWeatherData(latitude, longitude, apiKey) }
+                    val detailedDataResponse = async {
+                        weatherCastRepository.getDetailedWeatherData(
+                            latitude,
+                            longitude,
+                            apiKey
+                        )
+                    }
+                    val airPollutionDataResponse =
+                        async {
+                            weatherCastRepository.getAriPollutionData(
+                                latitude,
+                                longitude,
+                                apiKey
+                            )
+                        }
+                    delay(444L)
+
+                    weatherData.postValue(handleWeatherDataResponse(weatherDataResponse.await()))
+                    detailedWeatherData.postValue(handleDetailedDataResponse(detailedDataResponse.await()))
+                    airPollutionWeatherData.postValue(
+                        handleAirPollutionDataResponse(
+                            airPollutionDataResponse.await()
+                        )
+                    )
+                }
             } else {
                 weatherData.postValue(Resource.Error("No internet connection"))
                 Timber.d("VMError: $weatherData")
@@ -60,11 +86,6 @@ class WeatherCastViewModel(
                 is IOException -> weatherData.postValue(Resource.Error("Network Failure"))
                 else -> {
                     weatherData.postValue(Resource.Error("Conversion Error: $t"))
-                    Timber.d("VMError lm ${t.localizedMessage}")
-                    Timber.d("VMError st${t.stackTrace}")
-                    Timber.d("VMError sup${t.suppressed}")
-                    Timber.d("VMError cause${t.cause}")
-                    Timber.d("VMError message${t.message}")
                 }
             }
 
@@ -72,13 +93,36 @@ class WeatherCastViewModel(
     }
 
     private fun handleWeatherDataResponse(response: Response<WeatherResponse>): Resource<WeatherResponse> {
-        Timber.d("ResponseHWDR: ${response.message()}")
         if (response.isSuccessful) {
             response.body()?.let { resultResponse ->
 
                 weatherDataResponse = resultResponse
 
                 return Resource.Success(weatherDataResponse ?: resultResponse)
+            }
+        }
+        return Resource.Error(response.message())
+    }
+
+    private fun handleDetailedDataResponse(response: Response<DetailedWeatherResponse>): Resource<DetailedWeatherResponse> {
+        if (response.isSuccessful) {
+            response.body()?.let { resultResponse ->
+
+                detailedWeatherResponse = resultResponse
+
+                return Resource.Success(detailedWeatherResponse ?: resultResponse)
+            }
+        }
+        return Resource.Error(response.message())
+    }
+
+    private fun handleAirPollutionDataResponse(response: Response<AirPollutionResponse>): Resource<AirPollutionResponse> {
+        if (response.isSuccessful) {
+            response.body()?.let { resultResponse ->
+
+                airPollutionResponse = resultResponse
+
+                return Resource.Success(airPollutionResponse ?: resultResponse)
             }
         }
         return Resource.Error(response.message())

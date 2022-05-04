@@ -14,26 +14,30 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.squareup.picasso.Picasso
 import com.zvonimirplivelic.weathercast.R
 import com.zvonimirplivelic.weathercast.WeatherCastViewModel
-import com.zvonimirplivelic.weathercast.model.WeatherResponse
+import com.zvonimirplivelic.weathercast.model.DetailedWeatherResponse
 import com.zvonimirplivelic.weathercast.util.Constants
 import com.zvonimirplivelic.weathercast.util.Resource
-import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.roundToInt
 
+
 class CurrentWeatherFragment : Fragment() {
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var viewModel: WeatherCastViewModel
-    private lateinit var weatherData: WeatherResponse
+    lateinit var hourlyForecastAdapter: HourlyForecastAdapter
+    lateinit var dailyForecastAdapter: DailyForecastAdapter
 
     private lateinit var parentLayout: FrameLayout
     private lateinit var childLayout: ConstraintLayout
@@ -41,6 +45,7 @@ class CurrentWeatherFragment : Fragment() {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private lateinit var tvLocationName: TextView
+    private lateinit var ivCurrentWeatherImage: ImageView
     private lateinit var tvUpdatedTime: TextView
     private lateinit var tvCurrentTemperature: TextView
     private lateinit var tvMinMaxTemperature: TextView
@@ -55,6 +60,20 @@ class CurrentWeatherFragment : Fragment() {
     private lateinit var tvVisibility: TextView
     private lateinit var tvSunriseTime: TextView
     private lateinit var tvSunsetTime: TextView
+
+    private lateinit var rvHourlyForecast: RecyclerView
+
+    private lateinit var tvAirQualityIndex: TextView
+    private lateinit var tvCOMeasurement: TextView
+    private lateinit var tvNOMeasurement: TextView
+    private lateinit var tvNO2Measurement: TextView
+    private lateinit var tvO3Measurement: TextView
+    private lateinit var tvSO2Measurement: TextView
+    private lateinit var tvPM25Measurement: TextView
+    private lateinit var tvPM10Measurement: TextView
+    private lateinit var tvNH3Measurement: TextView
+
+    private lateinit var rvDailyForecast: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,10 +92,15 @@ class CurrentWeatherFragment : Fragment() {
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
 
         tvLocationName = view.findViewById(R.id.tv_location_name)
+        ivCurrentWeatherImage = view.findViewById(R.id.iv_current_weather_image)
         tvCurrentTemperature = view.findViewById(R.id.tv_current_temperature)
         tvMinMaxTemperature = view.findViewById(R.id.tv_min_max_temperature)
         tvFeelsLikeTemperature = view.findViewById(R.id.tv_feels_like_temperature)
         tvWeatherDescription = view.findViewById(R.id.tv_weather_description)
+
+        rvHourlyForecast = view.findViewById(R.id.rv_hourly_forecast)
+        hourlyForecastAdapter = HourlyForecastAdapter()
+
         tvAirPressure = view.findViewById(R.id.tv_air_pressure)
         tvAirHumidity = view.findViewById(R.id.tv_air_humidity)
         tvWindSpeed = view.findViewById(R.id.tv_wind_speed)
@@ -88,6 +112,19 @@ class CurrentWeatherFragment : Fragment() {
         tvSunriseTime = view.findViewById(R.id.tv_sunrise_time)
         tvSunsetTime = view.findViewById(R.id.tv_sunset_time)
 
+        tvAirQualityIndex = view.findViewById(R.id.tv_air_quality_index)
+        tvCOMeasurement = view.findViewById(R.id.tv_co_measurement)
+        tvNOMeasurement = view.findViewById(R.id.tv_no_measurement)
+        tvNO2Measurement = view.findViewById(R.id.tv_no2_measurement)
+        tvO3Measurement = view.findViewById(R.id.tv_o3_measurement)
+        tvSO2Measurement = view.findViewById(R.id.tv_so2_measurement)
+        tvPM25Measurement = view.findViewById(R.id.tv_pm25_measurement)
+        tvPM10Measurement = view.findViewById(R.id.tv_pm10_measurement)
+        tvNH3Measurement = view.findViewById(R.id.tv_nh3_measurement)
+
+        rvDailyForecast = view.findViewById(R.id.rv_daily_forecast)
+        dailyForecastAdapter = DailyForecastAdapter()
+
         fetchLocation()
 
         viewModel.weatherData.observe(viewLifecycleOwner) { response ->
@@ -98,11 +135,10 @@ class CurrentWeatherFragment : Fragment() {
                     parentLayout.isVisible = true
                     childLayout.isVisible = true
                     progressBar.isVisible = false
-                    response.data?.let { weatherResponse ->
-                        Timber.d("ResponseMain: $weatherResponse")
-                        weatherData = weatherResponse
 
-                        weatherData.let { weatherData ->
+                    response.data?.let { weatherResponse ->
+
+                        weatherResponse.let { weatherData ->
 
                             val weatherGraphicsCode = when (weatherData.weather[0].id) {
                                 in 200..232 -> R.drawable.pic_thunderstorm
@@ -139,6 +175,14 @@ class CurrentWeatherFragment : Fragment() {
                                 }
 
                             tvLocationName.text = weatherData.name
+
+                            val weatherImageURLString =
+                                "https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png"
+
+                            Picasso.get().load(weatherImageURLString)
+                                .resize(275, 275)
+                                .into(ivCurrentWeatherImage)
+
                             tvCurrentTemperature.text = resources.getString(
                                 R.string.temperature_string,
                                 convertTemperature(weatherData.main.temp)
@@ -156,6 +200,7 @@ class CurrentWeatherFragment : Fragment() {
                                 )
                             tvWeatherDescription.text =
                                 weatherData.weather[0].description.replaceFirstChar { it.uppercase() }
+
                             tvAirPressure.text = resources.getString(
                                 R.string.air_pressure_string,
                                 weatherData.main.pressure
@@ -210,7 +255,6 @@ class CurrentWeatherFragment : Fragment() {
                             Toast.LENGTH_LONG
                         )
                             .show()
-                        Timber.d("ResponseMessage: $message")
                     }
                 }
 
@@ -222,6 +266,139 @@ class CurrentWeatherFragment : Fragment() {
                 }
             }
         }
+
+        viewModel.detailedWeatherData.observe(viewLifecycleOwner) { response ->
+            when (response) {
+
+                is Resource.Success -> {
+
+                    parentLayout.isVisible = true
+                    childLayout.isVisible = true
+                    progressBar.isVisible = false
+
+                    response.data?.let { detailedForecastData ->
+                        val hourlyForecast =
+                            detailedForecastData.hourlyWeather.subList(1, 25)
+                        val dailyForecast = detailedForecastData.dailyWeather.subList(1, 8)
+
+                        val horizontalLayoutManager = LinearLayoutManager(
+                            requireContext(),
+                            LinearLayoutManager.HORIZONTAL,
+                            false
+                        )
+
+                        hourlyForecastAdapter.differ.submitList(hourlyForecast)
+                        dailyForecastAdapter.differ.submitList(dailyForecast)
+
+                        rvHourlyForecast.apply {
+                            layoutManager = horizontalLayoutManager
+                            adapter = hourlyForecastAdapter
+                        }
+
+                        rvDailyForecast.apply {
+                            layoutManager = LinearLayoutManager(requireContext())
+                            adapter = dailyForecastAdapter
+                        }
+                    }
+                }
+
+                is Resource.Error -> {
+                    parentLayout.isVisible = false
+                    childLayout.isVisible = false
+                    progressBar.isVisible = false
+                    response.message?.let { message ->
+                        Toast.makeText(
+                            requireContext(),
+                            "Unable to fetch detailed weather data: $message",
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
+                    }
+                }
+
+                is Resource.Loading -> {
+                    parentLayout.isVisible = false
+                    childLayout.isVisible = false
+                    swipeRefreshLayout.isRefreshing = false
+                    progressBar.isVisible = true
+                }
+            }
+        }
+
+        viewModel.airPollutionWeatherData.observe(viewLifecycleOwner) { response ->
+            when (response) {
+
+                is Resource.Success -> {
+
+                    parentLayout.isVisible = true
+                    childLayout.isVisible = true
+                    progressBar.isVisible = false
+
+                    response.data?.let { airPollutionData ->
+
+                        val pollutionData = airPollutionData.list[0]
+                        tvAirQualityIndex.text = resources.getString(
+                            R.string.air_quality_index_string,
+                            pollutionData.main.aqi
+                        )
+                        tvCOMeasurement.text = resources.getString(
+                            R.string.co_measurement_string,
+                            pollutionData.components.co.toString().take(6)
+                        )
+                        tvNOMeasurement.text = resources.getString(
+                            R.string.no_measurement_string,
+                            pollutionData.components.no.toString().take(6)
+                        )
+                        tvNO2Measurement.text = resources.getString(
+                            R.string.no2_measurement_string,
+                            pollutionData.components.no2.toString().take(6)
+                        )
+                        tvO3Measurement.text = resources.getString(
+                            R.string.o3_measurement_string,
+                            pollutionData.components.o3.toString().take(6)
+                        )
+                        tvSO2Measurement.text = resources.getString(
+                            R.string.so2_measurement_string,
+                            pollutionData.components.so2.toString().take(6)
+                        )
+                        tvPM25Measurement.text = resources.getString(
+                            R.string.pm2_5_measurement_string,
+                            pollutionData.components.pm25.toString().take(6)
+                        )
+                        tvPM10Measurement.text = resources.getString(
+                            R.string.pm10_measurement_string,
+                            pollutionData.components.pm10.toString().take(6)
+                        )
+                        tvNH3Measurement.text = resources.getString(
+                            R.string.nh3_measurement_string,
+                            pollutionData.components.nh3.toString().take(6)
+                        )
+                    }
+                }
+
+                is Resource.Error -> {
+                    parentLayout.isVisible = false
+                    childLayout.isVisible = false
+                    progressBar.isVisible = false
+                    response.message?.let { message ->
+                        Toast.makeText(
+                            requireContext(),
+                            "Unable to fetch air pollution data: $message",
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
+                    }
+                }
+
+                is Resource.Loading -> {
+                    parentLayout.isVisible = false
+                    childLayout.isVisible = false
+                    swipeRefreshLayout.isRefreshing = false
+                    progressBar.isVisible = true
+                }
+            }
+        }
+
 
         swipeRefreshLayout.setOnRefreshListener {
             fetchLocation()
@@ -244,7 +421,7 @@ class CurrentWeatherFragment : Fragment() {
                     val lat = location.latitude.toString()
                     val lon = location.longitude.toString()
 
-                    viewModel.getWeatherData(lat, lon, apiKey)
+                    viewModel.getRemoteData(lat, lon, apiKey)
                 }
             }
         }
