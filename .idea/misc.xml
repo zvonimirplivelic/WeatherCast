@@ -19,6 +19,7 @@
         <entry key="app/src/main/res/drawable/ic_wind_direction.xml" value="0.1985" />
         <entry key="app/src/main/res/drawable/ic_wind_speed.xml" value="0.1985" />
         <entry key="app/src/main/res/drawable/night_background.xml" value="0.1985" />
+        <entry key="app/src/main/res/layout/daily_forecast_list_item.xml" value="0.1105072463768116" />
         <entry key="app/src/main/res/layout/fragment_current_weather.xml" value="0.19375" />
         <entry key="app/src/main/res/layout/hourly_forecast_list_item.xml" value="0.1105072463768116" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1" />

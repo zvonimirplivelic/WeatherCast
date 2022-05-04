@@ -11,4 +11,5 @@
     <color name="day_yellow">#77FFEB3B</color>
     <color name="night_black">#DD0E0E13</color>
     <color name="night_purple">#DD342159</color>
+    <color name="transparent">#00FFFFFF</color>
 </resources>

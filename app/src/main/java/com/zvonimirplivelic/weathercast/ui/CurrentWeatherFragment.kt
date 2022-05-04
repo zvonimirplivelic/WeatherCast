@@ -37,6 +37,7 @@ class CurrentWeatherFragment : Fragment() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var viewModel: WeatherCastViewModel
     lateinit var hourlyForecastAdapter: HourlyForecastAdapter
+    lateinit var dailyForecastAdapter: DailyForecastAdapter
 
     private lateinit var parentLayout: FrameLayout
     private lateinit var childLayout: ConstraintLayout
@@ -71,6 +72,8 @@ class CurrentWeatherFragment : Fragment() {
     private lateinit var tvPM25Measurement: TextView
     private lateinit var tvPM10Measurement: TextView
     private lateinit var tvNH3Measurement: TextView
+
+    private lateinit var rvDailyForecast: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -118,6 +121,9 @@ class CurrentWeatherFragment : Fragment() {
         tvPM25Measurement = view.findViewById(R.id.tv_pm25_measurement)
         tvPM10Measurement = view.findViewById(R.id.tv_pm10_measurement)
         tvNH3Measurement = view.findViewById(R.id.tv_nh3_measurement)
+
+        rvDailyForecast = view.findViewById(R.id.rv_daily_forecast)
+        dailyForecastAdapter = DailyForecastAdapter()
 
         fetchLocation()
 
@@ -273,17 +279,26 @@ class CurrentWeatherFragment : Fragment() {
                     response.data?.let { detailedForecastData ->
                         val hourlyForecast =
                             detailedForecastData.hourlyWeather.subList(1, 25)
+                        val dailyForecast = detailedForecastData.dailyWeather.subList(1, 8)
+
                         val horizontalLayoutManager = LinearLayoutManager(
                             requireContext(),
                             LinearLayoutManager.HORIZONTAL,
                             false
                         )
+
                         hourlyForecastAdapter.differ.submitList(hourlyForecast)
+                        dailyForecastAdapter.differ.submitList(dailyForecast)
+
                         rvHourlyForecast.apply {
                             layoutManager = horizontalLayoutManager
                             adapter = hourlyForecastAdapter
                         }
 
+                        rvDailyForecast.apply {
+                            layoutManager = LinearLayoutManager(requireContext())
+                            adapter = dailyForecastAdapter
+                        }
                     }
                 }
 

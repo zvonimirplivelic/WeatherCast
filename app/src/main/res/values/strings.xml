@@ -2,6 +2,7 @@
     <string name="app_name">WeatherCast</string>
     <string name="temperature_string">%s°C</string>
     <string name="min_max_temperature_string">Min: %1s°C / Max: %2s°C</string>
+    <string name="min_max_temperature_string_daily">%1s°C / %2s°C</string>
     <string name="feels_like_temperature_string">Feels like: %s°C</string>
     <string name="air_pressure_string">%dhPa</string>
     <string name="percentage_string">%d%%</string>

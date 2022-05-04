@@ -89,7 +89,4 @@ class HourlyForecastAdapter :
         val convertedTemperature = (value - 273.15).roundToInt()
         return convertedTemperature.toString()
     }
-
-
-
 }
